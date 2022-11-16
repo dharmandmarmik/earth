@@ -1,35 +1,299 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8">
-<title>Display a globe on a webpage</title>
-<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-<link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet">
-<script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
-<style>
-body { margin: 0; padding: 0; }
-#map { position: absolute; top: 0; bottom: 0; width: 100%; }
-</style>
-</head>
-<body>
-<div id="map"></div>
+  <head>
+    <meta charset="utf-8" />
+    <title>Earth</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
 
-<script>
-	mapboxgl.accessToken = 'pk.eyJ1IjoibWFybWlrLTEyMyIsImEiOiJjbDg1cDdxZGkwOThxM3Bwc2JwZmRmcWhrIn0.vTjwPDjmUEhDFvbmA801lw';
-    const map = new mapboxgl.Map({
-        container: 'map',
-        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
-        style: 'mapbox://styles/mapbox/satellite-streets-v11',
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      mapboxgl.accessToken =
+        "pk.eyJ1IjoibWFybWlrLTEyMyIsImEiOiJjbDg1cDdxZGkwOThxM3Bwc2JwZmRmcWhrIn0.vTjwPDjmUEhDFvbmA801lw";
+      const map = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/satellite-streets-v11",
         zoom: 1.5,
         center: [30, 50],
-        projection: 'globe'
-    });
+        projection: "globe",
+      });
 
-    map.on('load', () => {
-        // Set the default atmosphere style
-        map.setFog({});
-    });
-</script>
+      map.on("load", () => {
+        // Set the default atmosphere
+        map.addControl(
+          new mapboxgl.NavigationControl(
+            { atmosphere: true },
+            { showCompass: true },
+            { showZoom: true }
+          )
+        );
+        map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
+        // Add a layer showing the places.
+        map.addLayer({
+          id: "places",
+          type: "symbol",
+          source: {
+            type: "geojson",
+            data: {
+              type: "FeatureCollection",
+              features: [
+                {
+                  type: "Feature",
+                  properties: {
+                    description: "<strong>Earth</strong>",
+                  },
+                  geometry: {
+                    type: "Point",
+                    coordinates: [0, 0],
+                  },
+                },
+              ],
+            },
+          },
+          layout: {
+            "icon-image": "rocket-15",
+            "icon-allow-overlap": true,
+          },
+        });
+        const popup = new mapboxgl.Popup({
+          closeButton: true,
+          closeOnClick: true,
+        });
 
-</body>
+        map.on("click", "places", (e) => {
+          const coordinates = e.features[0].geometry.coordinates.slice();
+          const description = e.features[0].properties.description;
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
+          popup.setLngLat(coordinates).setHTML(description).addTo(map);
+        });
+        map.on("mouseenter", "places", () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+
+        map.on("mouseleave", "places", () => {
+          map.getCanvas().style.cursor = "";
+        });
+        map.addLayer({
+          id: "sky",
+          type: "sky",
+          paint: {
+            "sky-type": "atmosphere",
+            "sky-atmosphere-sun": [0.0, 0.0],
+            "sky-atmosphere-sun-intensity": 15,
+          },
+        });
+        map.setLight({
+          anchor: "viewport",
+          color: "#ffffff",
+          intensity: 0.5,
+          position: [1.15, 210, 30],
+        });
+        map.addSource("earthquakes", {
+          type: "geojson",
+          data: "https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson",
+        });
+        map.setTerrain({
+          source: "mapbox",
+          exaggeration: 1.5,
+        });
+
+        map.addLayer({
+          id: "terrain-data",
+          type: "line",
+          source: {
+            type: "vector",
+            url: "mapbox://mapbox.mapbox-terrain-v2",
+          },
+          "source-layer": "contour",
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-color": "#877b59",
+            "line-width": 1,
+          },
+        });
+
+        map.addLayer(
+          {
+            id: "earthquakes-heat",
+            type: "heatmap",
+            source: "earthquakes",
+            maxzoom: 9,
+            paint: {
+              "heatmap-weight": [
+                "interpolate",
+                ["linear"],
+                ["get", "mag"],
+                0,
+                0,
+                6,
+                1,
+              ],
+              "heatmap-intensity": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                0,
+                1,
+                9,
+                3,
+              ],
+              "heatmap-color": [
+                "interpolate",
+                ["linear"],
+                ["heatmap-density"],
+                0,
+                "rgba(33,102,172,0)",
+                0.2,
+                "rgb(103,169,207)",
+                0.4,
+                "rgb(209,229,240)",
+                0.6,
+                "rgb(253,219,199)",
+                0.8,
+                "rgb(239,138,98)",
+                1,
+                "rgb(178,24,43)",
+              ],
+              "heatmap-radius": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                0,
+                2,
+                9,
+                20,
+              ],
+              "heatmap-opacity": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                7,
+                1,
+                9,
+                0,
+              ],
+            },
+          },
+          "waterway-label"
+        );
+
+        map.addLayer(
+          {
+            id: "earthquakes-point",
+            type: "circle",
+            source: "earthquakes",
+            minzoom: 7,
+            paint: {
+              "circle-color": [
+                "interpolate",
+                ["linear"],
+                ["get", "mag"],
+                1,
+                "rgba(33,102,172,0)",
+                2,
+                "rgb(103,169,207)",
+                3,
+                "rgb(209,229,240)",
+                4,
+                "rgb(253,219,199)",
+                5,
+                "rgb(239,138,98)",
+                6,
+                "rgb(178,24,43)",
+              ],
+              "circle-radius": [
+                "interpolate",
+                ["linear"],
+                ["get", "mag"],
+                1,
+                1,
+                6,
+                4,
+              ],
+              "circle-stroke-color": "white",
+              "circle-stroke-width": 1,
+              "circle-opacity": [
+                "interpolate",
+                ["linear"],
+                ["zoom"],
+                7,
+                0,
+                8,
+                1,
+              ],
+            },
+          },
+          "waterway-label"
+        );
+
+        map.addLayer(
+          {
+            id: "earthquakes-label",
+            type: "symbol",
+            source: "earthquakes",
+            minzoom: 7,
+
+            layout: {
+              "text-field": "{mag}",
+              "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+              "text-size": ["interpolate", ["linear"], ["zoom"], 7, 9, 16, 32],
+            },
+          },
+          "waterway-label"
+        );
+
+        map.setFog({
+          color: "#fff",
+          "high-color": "rgb(36, 92, 223)",
+          "horizon-blend": 0.02,
+          "space-color": "rgb(11, 11, 25)",
+          "star-intensity": 0.8,
+          density: 0.0005,
+          range: 0.5,
+          strength: 0.6,
+          enabled: true,
+          transition: 0.5,
+          "transition-intensity": 0.5,
+          "transition-speed": 0.5,
+          "transition-delay": 0.5,
+          "transition-duration": 0.5,
+          "transition-timing-function": "linear",
+          "transition-timing-function": "ease",
+          "transition-timing-function": "ease-in",
+          "transition-timing-function": "ease-out",
+          "transition-timing-function": "ease-in-out",
+          "transition-timing-function": "cubic-bezier(0.0, 0.0, 0.2, 1)",
+          "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.2, 1)",
+          "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.6, 1)",
+          "transition-timing-function": "cubic-bezier(0.4, 0.0, 1, 1)",
+        });
+      });
+    </script>
+  </body>
 </html>
