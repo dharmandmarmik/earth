@@ -24,6 +24,7 @@
         bottom: 0;
         width: 100%;
       }
+
     </style>
   </head>
   <body>
@@ -43,9 +44,11 @@
         // Set the default atmosphere
         map.addControl(
           new mapboxgl.NavigationControl(
-            { atmosphere: true },
-            { showCompass: true },
-            { showZoom: true }
+            // all navigations controls enabled by default
+            {
+              showCompass: true,
+              showZoom: true,
+            }
           )
         );
         map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
@@ -292,8 +295,30 @@
           "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.2, 1)",
           "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.6, 1)",
           "transition-timing-function": "cubic-bezier(0.4, 0.0, 1, 1)",
+          "transition-timing-function": "cubic-bezier(0.0, 0.0, 0.6, 1)",
+          "transition-timing-function": "cubic-bezier(0.0, 0.0, 1, 1)",
+          "transition-timing-function": "cubic-bezier(0.0, 0.0, 0.2, 1)",
+          "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.2, 1)",
+          "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.6, 1)",
+          "transition-timing-function": "cubic-bezier(0.4, 0.0, 1, 1)",
+          "transition-timing-function": "cubic-bezier(0.0, 0.0, 1, 1)",
+
         });
       });
+      map.addControl(new mapboxgl.FullscreenControl());
+      map.addControl(new mapboxgl.GeolocateControl(
+        {
+          positionOptions: {
+            enableHighAccuracy: true,
+          },
+          trackUserLocation: true,
+        }
+      ));
+      map.addControl(new mapboxgl.ScaleControl());
+      // search box
+
+
+
     </script>
   </body>
 </html>
