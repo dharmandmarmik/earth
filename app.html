@@ -19,7 +19,6 @@
     />
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
 
-
     <style>
       body {
         margin: 0;
@@ -34,14 +33,23 @@
       .calculation-box {
         height: 50px;
         width: 150px;
-        margin-top: 40px;
         position: relative;
-        background-color: black;
+        background-color: blue;
         color: white;
-        bottom: 40px;
-        letter-spacing: normal;
         text-align: center;
         font-family: "Poppins", sans-serif;
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 50px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+      }
+      .mapboxgl-ctrl-pitchtoggle-3d {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCI+ICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHN0eWxlPSJmb250LXNpemU6IDE0cHg7IGZvbnQtZmFtaWx5OiAnSGVsdmV0aWNhIE5ldWUnLEFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmOyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsiPjNEPC90ZXh0Pjwvc3ZnPg==);
+      }
+
+      .mapboxgl-ctrl-pitchtoggle-2d {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCI+ICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHN0eWxlPSJmb250LXNpemU6IDE0cHg7IGZvbnQtZmFtaWx5OiAnSGVsdmV0aWNhIE5ldWUnLEFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmOyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsiPjJEPC90ZXh0Pjwvc3ZnPg==);
       }
     </style>
   </head>
@@ -68,6 +76,7 @@
         projection: "globe",
       });
 
+      //setting of
 
       map.on("load", () => {
         // Set the default atmosphere
@@ -81,6 +90,33 @@
           )
         );
         map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
+        map.addLayer({
+          id: "sky",
+          type: "sky",
+          paint: {
+            "sky-type": "atmosphere",
+            "sky-atmosphere-sun": [0.0, 0.0],
+            "sky-atmosphere-sun-intensity": 15,
+          },
+        });
+        map.addSource("mapbox-dem", {
+          type: "raster-dem",
+          url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+          tileSize: 512,
+          maxzoom: 14,
+        });
+        map.addLayer({
+          id: "hillshading",
+          source: "mapbox-dem",
+          type: "hillshade",
+          // insert below waterway-river-canal-shadow;
+          // where hillshading sits in the Mapbox Outdoors style
+          before: "waterway-river-canal-shadow",
+          paint: {
+            "hillshade-exaggeration": 1.5,
+          },
+        });
+
         // Add a layer showing the places.
         map.addLayer({
           id: "places",
@@ -106,6 +142,24 @@
           layout: {
             "icon-image": "rocket-15",
             "icon-allow-overlap": true,
+          },
+        });
+
+        // stellite animating in the background
+
+        map.addSource("satellite", {
+          type: "raster",
+          tiles: [
+            "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=",
+          ],
+          tileSize: 256,
+        });
+        map.addLayer({
+          id: "satellite",
+          type: "raster",
+          source: "satellite",
+          paint: {
+            "raster-opacity": 0.5,
           },
         });
 
@@ -379,6 +433,51 @@
             alert("Click the map to draw a polygon.");
         }
       }
+      class PitchToggle {
+        constructor({ bearing = -20, pitch = 70, minpitchzoom = null }) {
+          this._bearing = bearing;
+          this._pitch = pitch;
+          this._minpitchzoom = minpitchzoom;
+        }
+
+        onAdd(map) {
+          this._map = map;
+          let _this = this;
+
+          this._btn = document.createElement("button");
+          this._btn.className =
+            "mapboxgl-ctrl-icon mapboxgl-ctrl-pitchtoggle-3d";
+          this._btn.type = "button";
+          this._btn["aria-label"] = "Toggle Pitch";
+          this._btn.onclick = function () {
+            if (map.getPitch() === 0) {
+              let options = { pitch: _this._pitch, bearing: _this._bearing };
+              if (_this._minpitchzoom && map.getZoom() > _this._minpitchzoom) {
+                options.zoom = _this._minpitchzoom;
+              }
+              map.easeTo(options);
+              _this._btn.className =
+                "mapboxgl-ctrl-icon mapboxgl-ctrl-pitchtoggle-2d";
+            } else {
+              map.easeTo({ pitch: 0, bearing: 0 });
+              _this._btn.className =
+                "mapboxgl-ctrl-icon mapboxgl-ctrl-pitchtoggle-3d";
+            }
+          };
+
+          this._container = document.createElement("div");
+          this._container.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
+          this._container.appendChild(this._btn);
+
+          return this._container;
+        }
+
+        onRemove() {
+          this._container.parentNode.removeChild(this._container);
+          this._map = undefined;
+        }
+      }
+      map.addControl(new PitchToggle({ minpitchzoom: 11 }), "bottom-right");
     </script>
   </body>
 </html>
