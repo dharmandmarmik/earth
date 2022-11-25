@@ -68,6 +68,9 @@
     <script>
       mapboxgl.accessToken =
         "pk.eyJ1IjoibWFybWlrLTEyMyIsImEiOiJjbDg1cDdxZGkwOThxM3Bwc2JwZmRmcWhrIn0.vTjwPDjmUEhDFvbmA801lw";
+      mapboxgl.setRTLTextPlugin(
+        "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js"
+      );
       const map = new mapboxgl.Map({
         container: "map",
         style: "mapbox://styles/mapbox/satellite-streets-v11",
@@ -79,6 +82,35 @@
       //setting of
 
       map.on("load", () => {
+        map.setLayoutProperty("country-label", "text-field", [
+          "format",
+          ["get", "name_en"],
+          { "font-scale": 1.2 },
+          "\n",
+          {},
+          ["get", "name"],
+          {
+            "font-scale": 0.8,
+            "text-font": [
+              "literal",
+              ["DIN Offc Pro Italic", "Arial Unicode MS Regular"],
+            ],
+          },
+        ]);
+        map.addSource("dem", {
+          type: "raster-dem",
+          url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+        });
+        map.addLayer(
+          {
+            id: "hillshading",
+            source: "dem",
+            type: "hillshade",
+          },
+          // Insert below land-structure-polygon layer,
+          // where hillshading sits in the Mapbox Streets style.
+          "land-structure-polygon"
+        );
         // Set the default atmosphere
         map.addControl(
           new mapboxgl.NavigationControl(
@@ -410,6 +442,7 @@
         controls: {
           polygon: true,
           trash: true,
+          point:true,
         },
         defaultMode: "draw_polygon",
       });
@@ -477,7 +510,6 @@
           this._map = undefined;
         }
       }
-      map.addControl(new PitchToggle({ minpitchzoom: 11 }), "bottom-right");
     </script>
   </body>
 </html>
