@@ -1,515 +1,515 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <title>Earth</title>
-    <meta
-      name="viewport"
-      content="initial-scale=1,maximum-scale=1,user-scalable=no"
-    />
-    <link
-      href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css"
-      rel="stylesheet"
-    />
-    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
-      type="text/css"
-    />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet" />
+    <script
+        src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+    <link rel="stylesheet"
+        href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css"
+        type="text/css" />
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
 
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
-      }
-      .calculation-box {
-        height: 50px;
-        width: 150px;
-        position: relative;
-        background-color: blue;
-        color: white;
-        text-align: center;
-        font-family: "Poppins", sans-serif;
-        font-size: 10px;
-        font-weight: 600;
-        line-height: 50px;
-        border-radius: 5px;
-        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
-      }
-      .mapboxgl-ctrl-pitchtoggle-3d {
-        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCI+ICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHN0eWxlPSJmb250LXNpemU6IDE0cHg7IGZvbnQtZmFtaWx5OiAnSGVsdmV0aWNhIE5ldWUnLEFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmOyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsiPjNEPC90ZXh0Pjwvc3ZnPg==);
-      }
+        body {
+            margin: 0;
+            padding: 0;
+        }
 
-      .mapboxgl-ctrl-pitchtoggle-2d {
-        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCI+ICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHN0eWxlPSJmb250LXNpemU6IDE0cHg7IGZvbnQtZmFtaWx5OiAnSGVsdmV0aWNhIE5ldWUnLEFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmOyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsiPjJEPC90ZXh0Pjwvc3ZnPg==);
-      }
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .calculation-box {
+            height: 50px;
+            width: 150px;
+            position: relative;
+            background-color: blue;
+            color: white;
+            text-align: center;
+            margin-top: 150px;
+            font-family: "Poppins", sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            line-height: 50px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .mapboxgl-ctrl-pitchtoggle-3d {
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCI+ICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHN0eWxlPSJmb250LXNpemU6IDE0cHg7IGZvbnQtZmFtaWx5OiAnSGVsdmV0aWNhIE5ldWUnLEFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmOyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsiPjNEPC90ZXh0Pjwvc3ZnPg==);
+        }
+
+        .mapboxgl-ctrl-pitchtoggle-2d {
+            background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCI+ICAgIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHN0eWxlPSJmb250LXNpemU6IDE0cHg7IGZvbnQtZmFtaWx5OiAnSGVsdmV0aWNhIE5ldWUnLEFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmOyBmb250LXdlaWdodDogYm9sZDsgdGV4dC1hbmNob3I6IG1pZGRsZTsiPjJEPC90ZXh0Pjwvc3ZnPg==);
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.2/mapbox-gl-draw.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.2/mapbox-gl-draw.css"
-      type="text/css"
-    />
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.2/mapbox-gl-draw.css"
+        type="text/css" />
+        <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.js"></script>
+        <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.css" type="text/css">
     <div id="map"></div>
     <div class="calculation-box">
-      <div id="calculated-area"></div>
+        <div id="calculated-area"></div>
     </div>
     <script>
-      mapboxgl.accessToken =
-        "pk.eyJ1IjoibWFybWlrLTEyMyIsImEiOiJjbDg1cDdxZGkwOThxM3Bwc2JwZmRmcWhrIn0.vTjwPDjmUEhDFvbmA801lw";
-      mapboxgl.setRTLTextPlugin(
-        "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js"
-      );
-      const map = new mapboxgl.Map({
-        container: "map",
-        style: "mapbox://styles/mapbox/satellite-streets-v11",
-        zoom: 1.5,
-        center: [30, 50],
-        projection: "globe",
-      });
-
-      //setting of
-
-      map.on("load", () => {
-        map.setLayoutProperty("country-label", "text-field", [
-          "format",
-          ["get", "name_en"],
-          { "font-scale": 1.2 },
-          "\n",
-          {},
-          ["get", "name"],
-          {
-            "font-scale": 0.8,
-            "text-font": [
-              "literal",
-              ["DIN Offc Pro Italic", "Arial Unicode MS Regular"],
-            ],
-          },
-        ]);
-        map.addSource("dem", {
-          type: "raster-dem",
-          url: "mapbox://mapbox.mapbox-terrain-dem-v1",
-        });
-        map.addLayer(
-          {
-            id: "hillshading",
-            source: "dem",
-            type: "hillshade",
-          },
-          // Insert below land-structure-polygon layer,
-          // where hillshading sits in the Mapbox Streets style.
-          "land-structure-polygon"
+        mapboxgl.accessToken =
+            "pk.eyJ1IjoibWFybWlrLTEyMyIsImEiOiJjbDg1cDdxZGkwOThxM3Bwc2JwZmRmcWhrIn0.vTjwPDjmUEhDFvbmA801lw";
+        mapboxgl.setRTLTextPlugin(
+            "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.2.3/mapbox-gl-rtl-text.js"
         );
-        // Set the default atmosphere
-        map.addControl(
-          new mapboxgl.NavigationControl(
-            // all navigations controls enabled by default
-            {
-              showCompass: true,
-              showZoom: true,
-            }
-          )
-        );
-        map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
-        map.addLayer({
-          id: "sky",
-          type: "sky",
-          paint: {
-            "sky-type": "atmosphere",
-            "sky-atmosphere-sun": [0.0, 0.0],
-            "sky-atmosphere-sun-intensity": 15,
-          },
+        const map = new mapboxgl.Map({
+            container: "map",
+            style: "mapbox://styles/mapbox/satellite-streets-v11",
+            zoom: 1.5,
+            center: [30, 50],
+            projection: "globe",
         });
-        map.addSource("mapbox-dem", {
-          type: "raster-dem",
-          url: "mapbox://mapbox.mapbox-terrain-dem-v1",
-          tileSize: 512,
-          maxzoom: 14,
-        });
-        map.addLayer({
-          id: "hillshading",
-          source: "mapbox-dem",
-          type: "hillshade",
-          // insert below waterway-river-canal-shadow;
-          // where hillshading sits in the Mapbox Outdoors style
-          before: "waterway-river-canal-shadow",
-          paint: {
-            "hillshade-exaggeration": 1.5,
-          },
-        });
-
-        // Add a layer showing the places.
-        map.addLayer({
-          id: "places",
-          type: "symbol",
-          source: {
-            type: "geojson",
-            data: {
-              type: "FeatureCollection",
-              features: [
+        map.on("load", () => {
+            map.setLayoutProperty("country-label", "text-field", [
+                "format",
+                ["get", "name_en"],
+                { "font-scale": 1.2 },
+                "\n",
+                {},
+                ["get", "name"],
                 {
-                  type: "Feature",
-                  properties: {
-                    description: "<strong>Earth</strong>",
-                  },
-                  geometry: {
-                    type: "Point",
-                    coordinates: [0, 0],
-                  },
+                    "font-scale": 0.8,
+                    "text-font": [
+                        "literal",
+                        ["DIN Offc Pro Italic", "Arial Unicode MS Regular"],
+                    ],
                 },
-              ],
+            ]);
+            map.addSource("dem", {
+                type: "raster-dem",
+                url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+            });
+            map.addLayer(
+                {
+                    id: "hillshading",
+                    source: "dem",
+                    type: "hillshade",
+                },
+                "land-structure-polygon"
+            );
+            // Set the default atmosphere
+            map.addControl(
+                new mapboxgl.NavigationControl(
+                    {
+                        showCompass: true,
+                        showZoom: true,
+                    }
+                )
+            );
+            map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
+            map.addLayer({
+                id: "sky",
+                type: "sky",
+                paint: {
+                    "sky-type": "atmosphere",
+                    "sky-atmosphere-sun": [0.0, 0.0],
+                    "sky-atmosphere-sun-intensity": 15,
+                },
+            });
+            map.addSource("mapbox-dem", {
+                type: "raster-dem",
+                url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+                tileSize: 512,
+                maxzoom: 14,
+            });
+            map.addLayer({
+                id: "hillshading",
+                source: "mapbox-dem",
+                type: "hillshade",
+                // insert below waterway-river-canal-shadow;
+                // where hillshading sits in the Mapbox Outdoors style
+                before: "waterway-river-canal-shadow",
+                paint: {
+                    "hillshade-exaggeration": 1.5,
+                },
+            });
+
+            // Add a layer showing the places.
+            map.addLayer({
+                id: "places",
+                type: "symbol",
+                source: {
+                    type: "geojson",
+                    data: {
+                        type: "FeatureCollection",
+                        features: [
+                            {
+                                type: "Feature",
+                                properties: {
+                                    description: "<strong>Earth</strong>",
+                                },
+                                geometry: {
+                                    type: "Point",
+                                    coordinates: [0, 0],
+                                },
+                            },
+                        ],
+                    },
+                },
+                layout: {
+                    "icon-image": "rocket-15",
+                    "icon-allow-overlap": true,
+                },
+            });
+
+            // stellite animating in the background
+
+            map.addSource("satellite", {
+                type: "raster",
+                tiles: [
+                    "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=",
+                ],
+                tileSize: 256,
+            });
+            map.addLayer({
+                id: "satellite",
+                type: "raster",
+                source: "satellite",
+                paint: {
+                    "raster-opacity": 0.5,
+                },
+            });
+
+            const popup = new mapboxgl.Popup({
+                closeButton: true,
+                closeOnClick: true,
+            });
+
+            map.on("click", "places", (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const description = e.features[0].properties.description;
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+                popup.setLngLat(coordinates).setHTML(description).addTo(map);
+            });
+            map.on("mouseenter", "places", () => {
+                map.getCanvas().style.cursor = "pointer";
+            });
+
+            map.on("mouseleave", "places", () => {
+                map.getCanvas().style.cursor = "";
+            });
+            map.addLayer({
+                id: "sky",
+                type: "sky",
+                paint: {
+                    "sky-type": "atmosphere",
+                    "sky-atmosphere-sun": [0.0, 0.0],
+                    "sky-atmosphere-sun-intensity": 15,
+                },
+            });
+            map.setLight({
+                anchor: "viewport",
+                color: "#ffffff",
+                intensity: 0.5,
+                position: [1.15, 210, 30],
+            });
+            map.addSource("earthquakes", {
+                type: "geojson",
+                data: "https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson",
+            });
+            map.setTerrain({
+                source: "mapbox",
+                exaggeration: 1.5,
+            });
+
+            map.addLayer({
+                id: "terrain-data",
+                type: "line",
+                source: {
+                    type: "vector",
+                    url: "mapbox://mapbox.mapbox-terrain-v2",
+                },
+                "source-layer": "contour",
+                layout: {
+                    "line-join": "round",
+                    "line-cap": "round",
+                },
+                paint: {
+                    "line-color": "#877b59",
+                    "line-width": 1,
+                },
+            });
+
+            map.addLayer({
+                id: "earthquakes-heat",
+                type: "heatmap",
+                source: "earthquakes",
+                maxzoom: 9,
+                paint: {
+                    // Increase the heatmap weight based on frequency and property magnitude
+                    "heatmap-weight": [
+                        "interpolate",
+                        ["linear"],
+                        ["get", "mag"],
+                        0,
+                        0,
+                        6,
+                        1,
+                    ],
+                    "heatmap-intensity": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        0,
+                        1,
+                        9,
+                        3,
+                    ],
+                    "heatmap-color": [
+                        "interpolate",
+                        ["linear"],
+                        ["heatmap-density"],
+                        0,
+                        "rgba(33,102,172,0)",
+                        0.2,
+                        "rgb(103,169,207)",
+                        0.4,
+                        "rgb(209,229,240)",
+                        0.6,
+                        "rgb(253,219,199)",
+                        0.8,
+                        "rgb(239,138,98)",
+                        1,
+                        "rgb(178,24,43)",
+                    ],
+                    // Adjust the heatmap radius by zoom level
+                    "heatmap-radius": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        0,
+                        2,
+                        9,
+                        20,
+                    ],
+                    "heatmap-opacity": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        7,
+                        1,
+                        9,
+                        0,
+                    ],
+                },
+            });
+
+            // popup for earthquake data
+            map.on("click", "earthquakes-heat", (e) => {
+                const coordinates = e.features[0].geometry.coordinates.slice();
+                const mag = e.features[0].properties.mag;
+                const place = e.features[0].properties.place;
+
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(
+                        "magnitude: " + mag + "<br>" + "coordinates: " + coordinates
+                    )
+                    .addTo(map);
+            });
+
+            // Change the cursor to a pointer when the mouse is over the places layer.
+            map.on("mouseenter", "earthquakes-heat", () => {
+                map.getCanvas().style.cursor = "pointer";
+            });
+
+            // Change it back to a pointer when it leaves.
+            map.on("mouseleave", "earthquakes-heat", () => {
+                map.getCanvas().style.cursor = "";
+            });
+            map.addLayer({
+                id: "earthquakes-point",
+                type: "circle",
+                source: "earthquakes",
+                minzoom: 7,
+                paint: {
+                    "circle-radius": [
+                        "interpolate",
+                        ["linear"],
+                        ["zoom"],
+                        7,
+                        ["interpolate", ["linear"], ["get", "mag"], 1, 1, 6, 4],
+                        16,
+                        ["interpolate", ["linear"], ["get", "mag"], 1, 5, 6, 50],
+                    ],
+                    "circle-color": [
+                        "interpolate",
+                        ["linear"],
+                        ["get", "mag"],
+                        1,
+                        "rgba(33,102,172,0)",
+                        2,
+                        "rgb(103,169,207)",
+                        3,
+                        "rgb(209,229,240)",
+                        4,
+                        "rgb(253,219,199)",
+                        5,
+                        "rgb(239,138,98)",
+                        6,
+                        "rgb(178,24,43)",
+                    ],
+                    "circle-stroke-color": "white",
+                    "circle-stroke-width": 1,
+                    // Transition from heatmap to circle layer by zoom level
+                    "circle-opacity": ["interpolate", ["linear"], ["zoom"], 7, 0, 8, 1],
+                },
+            });
+
+            map.setFog({
+                color: "#fff",
+                "high-color": "rgb(36, 92, 223)",
+                "horizon-blend": 0.02,
+                "space-color": "rgb(11, 11, 25)",
+                "star-intensity": 0.8,
+                density: 0.0005,
+                range: 0.5,
+                strength: 0.6,
+                enabled: true,
+                transition: 0.5,
+                "transition-intensity": 0.5,
+                "transition-speed": 0.5,
+                "transition-delay": 0.5,
+                "transition-duration": 0.5,
+                "transition-timing-function": "linear",
+                "transition-timing-function": "ease",
+                "transition-timing-function": "ease-in",
+                "transition-timing-function": "ease-out",
+                "transition-timing-function": "ease-in-out",
+                "transition-timing-function": "cubic-bezier(0.0, 0.0, 0.2, 1)",
+                "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.2, 1)",
+                "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.6, 1)",
+                "transition-timing-function": "cubic-bezier(0.4, 0.0, 1, 1)",
+                "transition-timing-function": "cubic-bezier(0.0, 0.0, 0.6, 1)",
+                "transition-timing-function": "cubic-bezier(0.0, 0.0, 1, 1)",
+                "transition-timing-function": "cubic-bezier(0.0, 0.0, 0.2, 1)",
+                "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.2, 1)",
+                "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.6, 1)",
+                "transition-timing-function": "cubic-bezier(0.4, 0.0, 1, 1)",
+                "transition-timing-function": "cubic-bezier(0.0, 0.0, 1, 1)",
+            });
+        });
+        map.addControl(
+            new MapboxGeocoder({
+                accessToken: mapboxgl.accessToken,
+                mapboxgl: mapboxgl,
+            })
+        );
+
+        map.addControl(new mapboxgl.FullscreenControl());
+        map.addControl(
+            new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true,
+                },
+                trackUserLocation: true,
+            })
+        );
+        map.addControl(new mapboxgl.ScaleControl());
+        const draw = new MapboxDraw({
+            displayControlsDefault: false,
+            controls: {
+                polygon: true,
+                trash: true,
+                point: true,
             },
-          },
-          layout: {
-            "icon-image": "rocket-15",
-            "icon-allow-overlap": true,
-          },
+            defaultMode: "draw_polygon",
         });
+        map.addControl(draw);
 
-        // stellite animating in the background
+        map.on("draw.create", updateArea);
+        map.on("draw.delete", updateArea);
+        map.on("draw.update", updateArea);
 
-        map.addSource("satellite", {
-          type: "raster",
-          tiles: [
-            "https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=",
-          ],
-          tileSize: 256,
-        });
-        map.addLayer({
-          id: "satellite",
-          type: "raster",
-          source: "satellite",
-          paint: {
-            "raster-opacity": 0.5,
-          },
-        });
-
-        const popup = new mapboxgl.Popup({
-          closeButton: true,
-          closeOnClick: true,
-        });
-
-        map.on("click", "places", (e) => {
-          const coordinates = e.features[0].geometry.coordinates.slice();
-          const description = e.features[0].properties.description;
-          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-          }
-          popup.setLngLat(coordinates).setHTML(description).addTo(map);
-        });
-        map.on("mouseenter", "places", () => {
-          map.getCanvas().style.cursor = "pointer";
-        });
-
-        map.on("mouseleave", "places", () => {
-          map.getCanvas().style.cursor = "";
-        });
-        map.addLayer({
-          id: "sky",
-          type: "sky",
-          paint: {
-            "sky-type": "atmosphere",
-            "sky-atmosphere-sun": [0.0, 0.0],
-            "sky-atmosphere-sun-intensity": 15,
-          },
-        });
-        map.setLight({
-          anchor: "viewport",
-          color: "#ffffff",
-          intensity: 0.5,
-          position: [1.15, 210, 30],
-        });
-        map.addSource("earthquakes", {
-          type: "geojson",
-          data: "https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson",
-        });
-        map.setTerrain({
-          source: "mapbox",
-          exaggeration: 1.5,
-        });
-
-        map.addLayer({
-          id: "terrain-data",
-          type: "line",
-          source: {
-            type: "vector",
-            url: "mapbox://mapbox.mapbox-terrain-v2",
-          },
-          "source-layer": "contour",
-          layout: {
-            "line-join": "round",
-            "line-cap": "round",
-          },
-          paint: {
-            "line-color": "#877b59",
-            "line-width": 1,
-          },
-        });
-
-        map.addLayer({
-          id: "earthquakes-heat",
-          type: "heatmap",
-          source: "earthquakes",
-          maxzoom: 9,
-          paint: {
-            // Increase the heatmap weight based on frequency and property magnitude
-            "heatmap-weight": [
-              "interpolate",
-              ["linear"],
-              ["get", "mag"],
-              0,
-              0,
-              6,
-              1,
-            ],
-            "heatmap-intensity": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              0,
-              1,
-              9,
-              3,
-            ],
-            "heatmap-color": [
-              "interpolate",
-              ["linear"],
-              ["heatmap-density"],
-              0,
-              "rgba(33,102,172,0)",
-              0.2,
-              "rgb(103,169,207)",
-              0.4,
-              "rgb(209,229,240)",
-              0.6,
-              "rgb(253,219,199)",
-              0.8,
-              "rgb(239,138,98)",
-              1,
-              "rgb(178,24,43)",
-            ],
-            // Adjust the heatmap radius by zoom level
-            "heatmap-radius": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              0,
-              2,
-              9,
-              20,
-            ],
-            "heatmap-opacity": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              7,
-              1,
-              9,
-              0,
-            ],
-          },
-        });
-
-        // popup for earthquake data
-        map.on("click", "earthquakes-heat", (e) => {
-          const coordinates = e.features[0].geometry.coordinates.slice();
-          const mag = e.features[0].properties.mag;
-          const place = e.features[0].properties.place;
-
-          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-          }
-
-          new mapboxgl.Popup()
-            .setLngLat(coordinates)
-            .setHTML(
-              "magnitude: " + mag + "<br>" + "coordinates: " + coordinates
-            )
-            .addTo(map);
-        });
-
-        // Change the cursor to a pointer when the mouse is over the places layer.
-        map.on("mouseenter", "earthquakes-heat", () => {
-          map.getCanvas().style.cursor = "pointer";
-        });
-
-        // Change it back to a pointer when it leaves.
-        map.on("mouseleave", "earthquakes-heat", () => {
-          map.getCanvas().style.cursor = "";
-        });
-        map.addLayer({
-          id: "earthquakes-point",
-          type: "circle",
-          source: "earthquakes",
-          minzoom: 7,
-          paint: {
-            "circle-radius": [
-              "interpolate",
-              ["linear"],
-              ["zoom"],
-              7,
-              ["interpolate", ["linear"], ["get", "mag"], 1, 1, 6, 4],
-              16,
-              ["interpolate", ["linear"], ["get", "mag"], 1, 5, 6, 50],
-            ],
-            "circle-color": [
-              "interpolate",
-              ["linear"],
-              ["get", "mag"],
-              1,
-              "rgba(33,102,172,0)",
-              2,
-              "rgb(103,169,207)",
-              3,
-              "rgb(209,229,240)",
-              4,
-              "rgb(253,219,199)",
-              5,
-              "rgb(239,138,98)",
-              6,
-              "rgb(178,24,43)",
-            ],
-            "circle-stroke-color": "white",
-            "circle-stroke-width": 1,
-            // Transition from heatmap to circle layer by zoom level
-            "circle-opacity": ["interpolate", ["linear"], ["zoom"], 7, 0, 8, 1],
-          },
-        });
-
-        map.setFog({
-          color: "#fff",
-          "high-color": "rgb(36, 92, 223)",
-          "horizon-blend": 0.02,
-          "space-color": "rgb(11, 11, 25)",
-          "star-intensity": 0.8,
-          density: 0.0005,
-          range: 0.5,
-          strength: 0.6,
-          enabled: true,
-          transition: 0.5,
-          "transition-intensity": 0.5,
-          "transition-speed": 0.5,
-          "transition-delay": 0.5,
-          "transition-duration": 0.5,
-          "transition-timing-function": "linear",
-          "transition-timing-function": "ease",
-          "transition-timing-function": "ease-in",
-          "transition-timing-function": "ease-out",
-          "transition-timing-function": "ease-in-out",
-          "transition-timing-function": "cubic-bezier(0.0, 0.0, 0.2, 1)",
-          "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.2, 1)",
-          "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.6, 1)",
-          "transition-timing-function": "cubic-bezier(0.4, 0.0, 1, 1)",
-          "transition-timing-function": "cubic-bezier(0.0, 0.0, 0.6, 1)",
-          "transition-timing-function": "cubic-bezier(0.0, 0.0, 1, 1)",
-          "transition-timing-function": "cubic-bezier(0.0, 0.0, 0.2, 1)",
-          "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.2, 1)",
-          "transition-timing-function": "cubic-bezier(0.4, 0.0, 0.6, 1)",
-          "transition-timing-function": "cubic-bezier(0.4, 0.0, 1, 1)",
-          "transition-timing-function": "cubic-bezier(0.0, 0.0, 1, 1)",
-        });
-      });
-      map.addControl(
-        new MapboxGeocoder({
-          accessToken: mapboxgl.accessToken,
-          mapboxgl: mapboxgl,
-        })
-      );
-
-      map.addControl(new mapboxgl.FullscreenControl());
-      map.addControl(
-        new mapboxgl.GeolocateControl({
-          positionOptions: {
-            enableHighAccuracy: true,
-          },
-          trackUserLocation: true,
-        })
-      );
-      map.addControl(new mapboxgl.ScaleControl());
-      const draw = new MapboxDraw({
-        displayControlsDefault: false,
-        controls: {
-          polygon: true,
-          trash: true,
-          point:true,
-        },
-        defaultMode: "draw_polygon",
-      });
-      map.addControl(draw);
-
-      map.on("draw.create", updateArea);
-      map.on("draw.delete", updateArea);
-      map.on("draw.update", updateArea);
-
-      function updateArea(e) {
-        const data = draw.getAll();
-        const answer = document.getElementById("calculated-area");
-        if (data.features.length > 0) {
-          const area = turf.area(data);
-          // Restrict the area to 2 decimal points.
-          const rounded_area = Math.round(area * 100) / 100;
-          answer.innerHTML = `<p><strong>${rounded_area}</strong></p><p>square meters</p>`;
-        } else {
-          answer.innerHTML = "";
-          if (e.type !== "draw.delete")
-            alert("Click the map to draw a polygon.");
-        }
-      }
-      class PitchToggle {
-        constructor({ bearing = -20, pitch = 70, minpitchzoom = null }) {
-          this._bearing = bearing;
-          this._pitch = pitch;
-          this._minpitchzoom = minpitchzoom;
-        }
-
-        onAdd(map) {
-          this._map = map;
-          let _this = this;
-
-          this._btn = document.createElement("button");
-          this._btn.className =
-            "mapboxgl-ctrl-icon mapboxgl-ctrl-pitchtoggle-3d";
-          this._btn.type = "button";
-          this._btn["aria-label"] = "Toggle Pitch";
-          this._btn.onclick = function () {
-            if (map.getPitch() === 0) {
-              let options = { pitch: _this._pitch, bearing: _this._bearing };
-              if (_this._minpitchzoom && map.getZoom() > _this._minpitchzoom) {
-                options.zoom = _this._minpitchzoom;
-              }
-              map.easeTo(options);
-              _this._btn.className =
-                "mapboxgl-ctrl-icon mapboxgl-ctrl-pitchtoggle-2d";
+        function updateArea(e) {
+            const data = draw.getAll();
+            const answer = document.getElementById("calculated-area");
+            if (data.features.length > 0) {
+                const area = turf.area(data);
+                // Restrict the area to 2 decimal points.
+                const rounded_area = Math.round(area * 100) / 100;
+                answer.innerHTML = `<p><strong>${rounded_area}</strong></p><p>square meters</p>`;
             } else {
-              map.easeTo({ pitch: 0, bearing: 0 });
-              _this._btn.className =
-                "mapboxgl-ctrl-icon mapboxgl-ctrl-pitchtoggle-3d";
+                answer.innerHTML = "";
+                if (e.type !== "draw.delete")
+                    alert("Click the map to draw a polygon.");
             }
-          };
+        }
+        class PitchToggle {
+            constructor({ bearing = -20, pitch = 70, minpitchzoom = null }) {
+                this._bearing = bearing;
+                this._pitch = pitch;
+                this._minpitchzoom = minpitchzoom;
+            }
 
-          this._container = document.createElement("div");
-          this._container.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
-          this._container.appendChild(this._btn);
+            onAdd(map) {
+                this._map = map;
+                let _this = this;
 
-          return this._container;
+                this._btn = document.createElement("button");
+                this._btn.className =
+                    "mapboxgl-ctrl-icon mapboxgl-ctrl-pitchtoggle-3d";
+                this._btn.type = "button";
+                this._btn["aria-label"] = "Toggle Pitch";
+                this._btn.onclick = function () {
+                    if (map.getPitch() === 0) {
+                        let options = { pitch: _this._pitch, bearing: _this._bearing };
+                        if (_this._minpitchzoom && map.getZoom() > _this._minpitchzoom) {
+                            options.zoom = _this._minpitchzoom;
+                        }
+                        map.easeTo(options);
+                        _this._btn.className =
+                            "mapboxgl-ctrl-icon mapboxgl-ctrl-pitchtoggle-2d";
+                    } else {
+                        map.easeTo({ pitch: 0, bearing: 0 });
+                        _this._btn.className =
+                            "mapboxgl-ctrl-icon mapboxgl-ctrl-pitchtoggle-3d";
+                    }
+                };
+
+                this._container = document.createElement("div");
+                this._container.className = "mapboxgl-ctrl-group mapboxgl-ctrl";
+                this._container.appendChild(this._btn);
+
+                return this._container;
+            }
+
+            onRemove() {
+                this._container.parentNode.removeChild(this._container);
+                this._map = undefined;
+            }
         }
 
-        onRemove() {
-          this._container.parentNode.removeChild(this._container);
-          this._map = undefined;
-        }
-      }
+        map.addControl(
+            new MapboxDirections({
+                accessToken: mapboxgl.accessToken
+            }),
+            'top-left'
+        );
     </script>
-  </body>
+</body>
+
 </html>
